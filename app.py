@@ -23,6 +23,12 @@ class Patient(db.Model):
     severity = db.Column(db.String(10),  nullable = False)
     token = db.Column(db.Integer,nullable = True,unique = True)
     
+class Doctor(db.Model):
+    id = db.Column(db.Integer,primary_key = True)
+    name = db.Column(db.String(200), nullable = False)
+    email = db.Column(db.String(200), nullable = False)
+    password = db.Column(db.String(200), nullable = False)
+
 def gemResponse(prompt : str = None):
     genai.configure(api_key=api)
     model = genai.GenerativeModel("gemini-1.5-flash")
@@ -82,5 +88,25 @@ def patientList():
 
         print(i.severity,i.name)
     return render_template("queue.html",patients = seriousPatients)
+@app.route("/registration",methods = ["GET","POST"])
+def registration():
+    if request.method == "POST":
+        data = request.form.to_dict()
+        name = data.get("name")
+        email = data.get("email")
+        password = data.get("password")
+        confirmPassword = data.get("confirmPassword")
+        if password == confirmPassword:
+            newDoctor = Doctor(
+                name = name,
+                email = email,
+                password = password
+            )
+            db.session.add(newDoctor)
+            db.session.commit()
+            return "Account ctreated successfully"
+        return redirect(url_for("registration"))
+    return render_template("registration.html")
+
 if __name__ == "__main__":
     app.run(debug = True, port = 5001)

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Information Form</title>
+    <title>Registration Page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,15 +15,15 @@
             height: 100vh;
         }
 
-        .form-container {
+        .registration-container {
             background: #fff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            width: 300px;
         }
 
-        .form-container h1 {
+        .registration-container h2 {
             margin-bottom: 20px;
             font-size: 24px;
             color: #333;
@@ -40,9 +40,7 @@
             color: #555;
         }
 
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
+        .form-group input {
             width: 100%;
             padding: 10px;
             font-size: 14px;
@@ -52,14 +50,8 @@
             transition: border-color 0.3s;
         }
 
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
+        .form-group input:focus {
             border-color: #007BFF;
-        }
-
-        .form-group textarea {
-            resize: vertical;
         }
 
         .form-group button {
@@ -77,46 +69,39 @@
         .form-group button:hover {
             background-color: #0056b3;
         }
+
+        .form-group .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h1>Patient Information Form</h1>
-        <form action="/" method="POST">
+    <div class="registration-container">
+        <h2>Register</h2>
+        <form action = "{{url_for('registration')}}" id="registrationForm" method = "post">
             <div class="form-group">
-                <label for="patientname">Name:</label>
-                <input type="text" id="patientname" name="patientname" placeholder="Enter patient's name" required>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your name" required>
             </div>
-
             <div class="form-group">
-                <label for="patientage">Age:</label>
-                <input type="number" id="patientage" name="patientage" placeholder="Enter patient's age" required>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
             </div>
-
             <div class="form-group">
-                <label for="patientweight">Weight (kg):</label>
-                <input type="number" id="patientweight" name="patientweight" step="0.1" placeholder="Enter patient's weight" required>
+                <label for="password">New Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter a new password" required>
             </div>
-
             <div class="form-group">
-                <label for="patientgender">Gender:</label>
-                <select id="patientgender" name="patientgender" required>
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                </select>
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
             </div>
-
             <div class="form-group">
-                <label for="patientsymptom">Symptom:</label>
-                <textarea id="patientsymptom" name="patientsymptom" rows="4" placeholder="Describe the symptoms" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <button type="submit">Submit</button>
+                <button type="submit">Register</button>
             </div>
         </form>
     </div>
+
 </body>
 </html>
