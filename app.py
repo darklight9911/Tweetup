@@ -1,11 +1,12 @@
 import google.generativeai as genai
-from flask import Flask , redirect, render_template, request, url_for
+from flask import Flask , redirect, render_template, request, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 import random
 from flask_migrate import Migrate
 from env.secret import api
+from medico.programs import *
 app = Flask(__name__)
-
+app.config["SECRET_KEY"] ="dsojfksfvnvbnrdhslahjgvhbvh"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///patients.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -46,7 +47,7 @@ def form():
         prompt = f"""Patient's age {age} years old, weight {weight} kg and gender {gender}.His/Her symtomps are {symptom}.
         Now provide severity of that patient in this three category: serious, moderate ,normal.must reply in one word."""
         print(request.form)
-        severity = gemResponse(prompt)
+        severity = gemResponse(prompt).strip()
         new_patient = Patient(
             name = name,
             age = age,
@@ -59,35 +60,16 @@ def form():
         if " " not in severity:
             db.session.add(new_patient)
             db.session.commit()
-            return "Patient data saved successfully with severity"
-        return "Patient data not saved"
-    
+            return render_template("form.html")
+        return render_template("form.html")
+
         
     return render_template("form.html")
-@app.route("/queue")
+@app.route("/patientList")
 def patientList():
     patient = Patient.query.all()
-    seriousPatients = []
-    moderatePatients = []
-    normalPatients = []
-
-    for i in patient:
-        if i.severity.strip() == "Serious":
-            seriousPatients.append(i)
-        if i.severity.strip() == "Moderate":
-            moderatePatients.append(i) 
-        if i.severity.strip() == "Normal":
-            normalPatients.append(i)
-    
-    # finalpatientList = seriousPatients + moderatePatients + normalPatients
-    print(seriousPatients)
-    seriousPatients.extend(moderatePatients)
-    print(seriousPatients)
-    seriousPatients.extend(normalPatients)
-    for i in seriousPatients:
-
-        print(i.severity,i.name)
-    return render_template("queue.html",patients = seriousPatients)
+    patients = prioritySort(patient)
+    return render_template("patientList.html",patients = patients)
 @app.route("/registration",methods = ["GET","POST"])
 def registration():
     if request.method == "POST":
@@ -107,6 +89,27 @@ def registration():
             return "Account ctreated successfully"
         return redirect(url_for("registration"))
     return render_template("registration.html")
+@app.route("/login",methods = ["GET","POST"])
+def login():
+    if request.method == "POST":
+        data = request.form.to_dict()
+        name = data.get("name")
+        email = data.get("email")
+        password = data.get("password")
+        info = Doctor.query.filter_by(email = email).first()
+        if password == info.password:
+            session['isDoctor'] = True
+            return redirect(url_for("patientList"))
+        return redirect(url_for('login'))
+    return render_template("login.html")
+@app.route("/action/<int:delNo>")
+def action(delNo : int):
+    donePatient = Patient.query.filter_by(token = delNo).first()
+    if(donePatient == None):
+        return redirect(url_for("patientList"))
+    db.session.delete(donePatient)
+    db.session.commit()
+    return redirect(url_for("patientList"))
 
 if __name__ == "__main__":
     app.run(debug = True, port = 5001)

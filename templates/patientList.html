@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto py-10">
+    {% set isD = session.isDoctor %}
+    <h1 class="text-4xl font-bold mb-8 text-center text-gray-800">
+        Patient {% if isD %} Data {% else %} List {% endif %}
+    </h1>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white shadow-lg rounded-lg">
+            <thead>
+                <tr class="bg-gray-100 text-gray-700 uppercase text-sm leading-normal">
+                    {% if session.isDoctor %}
+                    <th class="py-4 px-6 text-left">Name</th>
+                    <th class="py-4 px-6 text-left">Age</th>
+                    <th class="py-4 px-6 text-left">Gender</th>
+                    <th class="py-4 px-6 text-left">Weight</th>
+                    <th class="py-4 px-6 text-center">Severity</th>
+                    <th class="py-4 px-6 text-center">Details</th>
+                    <th class="py-4 px-6 text-center">Action</th>
+                    {% else %}
+                    <th class="py-4 px-6 text-left">Name</th>
+                    <th class="py-4 px-6 text-center">Severity</th>
+                    <th class="py-4 px-6 text-center">Token</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody class="text-gray-800 text-sm">
+                {% for patient in patients %}
+                <tr class="border-b border-gray-200 hover:bg-gray-50">
+                    {% if session.isDoctor %}
+                    <td class="py-4 px-6 text-left">{{ patient.name }}</td>
+                    <td class="py-4 px-6 text-left">{{ patient.age }}</td>
+                    <td class="py-4 px-6 text-left">{{ patient.gender }}</td>
+                    <td class="py-4 px-6 text-left">{{ patient.weight }}</td>
+
+                    <td class="py-4 px-6 text-center">
+                        {% if patient.severity == 'Serious' %}
+                        <span class="text-red-600 font-semibold">&#x26A0; Serious</span>
+                        {% elif patient.severity == 'Moderate' %}
+                        <span class="text-yellow-500 font-semibold">&#x26A0; Moderate</span>
+                        {% else %}
+                        <span class="text-green-500 font-semibold">&#x2714; Normal</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="py-4 px-6 text-center">
+                        <button 
+                            data-symptom="{{ patient.symptom }}"
+                            class="details-button bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            View Details
+                        </button>
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                        <a href="{{url_for('action',delNo=patient.token)}}">
+                            <button class="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400">
+                                Done
+                            </button>
+                        </a>
+                    </td>
+                    {% else %}
+                    <td class="py-4 px-6 text-left">{{ patient.name }}</td>
+
+                    <td class="py-4 px-6 text-center">
+                        {% if patient.severity == 'Serious' %}
+                        <span class="text-red-600 font-semibold">&#x26A0; Serious</span>
+                        {% elif patient.severity == 'Moderate' %}
+                        <span class="text-yellow-500 font-semibold">&#x26A0; Moderate</span>
+                        {% else %}
+                        <span class="text-green-500 font-semibold">&#x2714; Normal</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="py-4 px-6 text-left">{{ patient.token }}</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="symptomModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-96 p-6 relative">
+        <button 
+            id="closeModalButton"
+            class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none">
+            &times;
+        </button>
+        <h2 class="text-xl font-semibold mb-4 text-gray-800">Symptom Details</h2>
+        <p id="symptomText" class="text-gray-700"></p>
+    </div>
+</div>
+
+<script>
+    // JavaScript to handle modal functionality
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById('symptomModal');
+        const symptomText = document.getElementById('symptomText');
+        const closeModalButton = document.getElementById('closeModalButton');
+
+        // Attach event listeners to all detail buttons
+        document.querySelectorAll('.details-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const symptom = this.getAttribute('data-symptom');
+                symptomText.textContent = symptom;
+                modal.classList.remove('hidden');
+            });
+        });
+
+        // Close modal when the close button is clicked
+        closeModalButton.addEventListener('click', function () {
+            modal.classList.add('hidden');
+        });
+
+        // Close modal when clicking outside of the modal
+        window.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+    });
+</script>
+{% endblock %}
