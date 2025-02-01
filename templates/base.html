@@ -5,53 +5,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tweet_Up</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-white shadow">
+<body class="bg-gray-50 font-sans leading-normal tracking-wide">
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md sticky top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <a href="/" class="flex-shrink-0 flex items-center">
-                        <!img class="h-8 w-8" src="/path/to/logo.png" alt="Logo">
-                        <span class="ml-3 text-xl font-semibold">Tweet_Up</span>
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <!-- Logo Section -->
+                    <a href="/" class="flex items-center space-x-2">
+                        <!-- <img class="h-8 w-8" src="/path/to/logo.png" alt="Logo"> -->
+                        <span class="text-2xl font-semibold text-indigo-600">Tweet_Up</span>
                     </a>
                 </div>
-                <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                    <a href="{{url_for('form')}}" class="text-gray-500 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">
-                        Take Appointment
+
+                <!-- Navigation Links for desktop -->
+                <div class="hidden md:flex space-x-8">
+                    <a href="{{url_for('form')}}" class="text-gray-600 hover:text-indigo-600 flex items-center space-x-1 text-sm font-medium">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Take Appointment</span>
                     </a>
-                    <a href="{{url_for('patientList')}}" class="text-gray-500 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">
-                        patientList
+                    <a href="{{url_for('patientList')}}" class="text-gray-600 hover:text-indigo-600 flex items-center space-x-1 text-sm font-medium">
+                        <i class="fas fa-users"></i>
+                        <span>Patient List</span>
                     </a>
-                    <a href="#" class="text-gray-500 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium">
-                        Contact Us
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 flex items-center space-x-1 text-sm font-medium">
+                        <i class="fas fa-phone-alt"></i>
+                        <span>Contact Us</span>
                     </a>
                 </div>
-                <div class="hidden sm:ml-6 sm:flex sm:items-center">
-                    <a href="{{url_for('registration')}}"><button type="button" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
-                        Registration
-                    </button></a>
+
+                <!-- Authentication Links for mobile and desktop -->
+                <div class="flex items-center space-x-4">
+                    {% if not session.isDoctor %}
+                        <a href="{{url_for('registration')}}">
+                            <button type="button" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-all duration-300">
+                                <i class="fas fa-user-plus"></i> Registration
+                            </button>
+                        </a>
+                        <a href="{{url_for('login')}}">
+                            <button type="button" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-all duration-300">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </button>
+                        </a>
+                    {% else %}
+                        <a href="{{url_for('logout')}}">
+                            <button type="button" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-all duration-300">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </a>
+                    {% endif %}
                 </div>
-                <div class="hidden sm:ml-6 sm:flex sm:items-center">
-                    <a href="{{url_for('login')}}"><button type="button" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
-                        Login
-                    </button></a>
+                
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-button" class="text-gray-600 hover:text-indigo-600 focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Dropdown -->
+            <div id="mobile-menu" class="md:hidden hidden bg-white shadow-md">
+                <div class="space-y-4 py-4 px-6">
+                    <a href="{{url_for('form')}}" class="text-gray-600 hover:text-indigo-600 flex items-center space-x-1 text-sm font-medium">
+                        <i class="fas fa-calendar-check"></i> Take Appointment
+                    </a>
+                    <a href="{{url_for('patientList')}}" class="text-gray-600 hover:text-indigo-600 flex items-center space-x-1 text-sm font-medium">
+                        <i class="fas fa-users"></i> Patient List
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-indigo-600 flex items-center space-x-1 text-sm font-medium">
+                        <i class="fas fa-phone-alt"></i> Contact Us
+                    </a>
+
+                    {% if not session.isDoctor %}
+                        <a href="{{url_for('registration')}}" class="block">
+                            <button type="button" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-all duration-300 w-full">
+                                <i class="fas fa-user-plus"></i> Registration
+                            </button>
+                        </a>
+                        <a href="{{url_for('login')}}" class="block">
+                            <button type="button" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-all duration-300 w-full">
+                                <i class="fas fa-sign-in-alt"></i> Login
+                            </button>
+                        </a>
+                    {% else %}
+                        <a href="{{url_for('logout')}}" class="block">
+                            <button type="button" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-all duration-300 w-full">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </nav>
 
+    <!-- Main Content -->
     <main class="py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Content goes here -->
             {% block content %}{% endblock %}
         </div>
     </main>
 
-    <footer class="bg-white shadow mt-10">
+    <!-- Footer -->
+    <footer class="bg-white shadow-lg mt-10">
         <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <p class="text-center text-gray-500 text-sm">&copy; 2025 Doctor Appointment Management. All rights reserved.</p>
+            <p class="text-center text-gray-500 text-sm">&copy; 2025 Tweet_Up. All rights reserved.</p>
         </div>
     </footer>
+
+    <!-- Mobile Menu Toggle Script -->
+    <script>
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        const mobileMenu = document.getElementById("mobile-menu");
+
+        mobileMenuButton.addEventListener("click", () => {
+            mobileMenu.classList.toggle("hidden");
+        });
+    </script>
 </body>
 </html>

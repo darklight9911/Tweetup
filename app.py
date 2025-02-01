@@ -110,6 +110,10 @@ def action(delNo : int):
     db.session.delete(donePatient)
     db.session.commit()
     return redirect(url_for("patientList"))
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for("login"))
 
 if __name__ == "__main__":
     app.run(debug = True, port = 5001)
